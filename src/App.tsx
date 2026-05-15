@@ -217,7 +217,7 @@ function CustomTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null
   return (
     <div style={{
-      background:'white', border:'1px solid #005EB8', borderRadius:12,
+      background:'white', border:'1px solid #00AEEF', borderRadius:12,
       padding:'10px 14px', boxShadow:'0 4px 16px rgba(0,94,184,.15)',
       fontSize:13, minWidth:148,
     }}>
@@ -237,7 +237,7 @@ function SliderRow({ label, value, onChange }: { label: string; value: number; o
     <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
         <span style={{ fontSize:13, color:'#4a5568' }}>{label}</span>
-        <span style={{ fontSize:13, fontWeight:700, color:'#005EB8', fontVariantNumeric:'tabular-nums' }}>{value}%</span>
+        <span style={{ fontSize:13, fontWeight:700, color:'#00AEEF', fontVariantNumeric:'tabular-nums' }}>{value}%</span>
       </div>
       <input
         type="range" min={0} max={100} value={value}
@@ -333,8 +333,8 @@ export default function App() {
             {YEARS.map(y => (
               <button key={y} onClick={() => setSelectedYear(y)} style={{
                 padding:'6px 18px', borderRadius:9999, fontSize:14, fontWeight:500,
-                border: y === selectedYear ? '1px solid #005EB8' : '1px solid #e5e7eb',
-                background: y === selectedYear ? '#005EB8' : 'white',
+                border: y === selectedYear ? '1px solid #00AEEF' : '1px solid #e5e7eb',
+                background: y === selectedYear ? '#00AEEF' : 'white',
                 color: y === selectedYear ? 'white' : '#1a1a2e',
                 cursor:'pointer', transition:'all .18s',
               }}>
@@ -353,7 +353,7 @@ export default function App() {
           </div>
           <div style={card}>
             <p style={{...sectionLabel, marginBottom:8}}>Implied Value</p>
-            <p style={{ fontSize:40, fontWeight:700, color:'#005EB8', lineHeight:1 }}>€{implied.toFixed(2)}</p>
+            <p style={{ fontSize:40, fontWeight:700, color:'#00AEEF', lineHeight:1 }}>€{implied.toFixed(2)}</p>
             <p style={{ fontSize:13, color:'#9ca3af', marginTop:6 }}>Composite model</p>
           </div>
           <div style={card}>
@@ -395,7 +395,7 @@ export default function App() {
         <div style={{ display:'flex', flexWrap:'wrap', alignItems:'center', justifyContent:'center', gap:12 }}>
           <button onClick={handleOptimize} disabled={optimizing} style={{
             display:'flex', alignItems:'center', gap:8,
-            background: optimizing ? '#9ca3af' : '#005EB8',
+            background: optimizing ? '#9ca3af' : '#00AEEF',
             color:'white', fontWeight:700, fontSize:13, letterSpacing:'0.04em',
             padding:'13px 28px', borderRadius:12, border:'none',
             cursor: optimizing ? 'not-allowed' : 'pointer', transition:'background .18s',
@@ -405,15 +405,15 @@ export default function App() {
           </button>
           <button onClick={handleReset} style={{
             display:'flex', alignItems:'center', gap:8,
-            background:'white', color:'#005EB8', fontWeight:700, fontSize:13, letterSpacing:'0.04em',
+            background:'white', color:'#00AEEF', fontWeight:700, fontSize:13, letterSpacing:'0.04em',
             padding:'13px 22px', borderRadius:12,
-            border:'1.5px solid #005EB8', cursor:'pointer', transition:'all .18s',
+            border:'1.5px solid #00AEEF', cursor:'pointer', transition:'all .18s',
           }}>
             <RotateCcw size={15} />
             RESET
           </button>
           {optMape !== null && (
-            <span style={{ fontSize:14, fontWeight:600, color:'#005EB8' }}>
+            <span style={{ fontSize:14, fontWeight:600, color:'#00AEEF' }}>
               Optimal MAPE: {optMape.toFixed(2)}%
             </span>
           )}
@@ -430,17 +430,17 @@ export default function App() {
                 tickFormatter={v=>`€${v}`} width={58} />
               <Tooltip content={<CustomTooltip />} />
               <Legend iconType="plainline" wrapperStyle={{ paddingTop:16, fontSize:12, color:'#4a5568' }} />
-              <ReferenceLine x={selectedYear} stroke="#005EB8" strokeDasharray="5 4"
+              <ReferenceLine x={selectedYear} stroke="#00AEEF" strokeDasharray="5 4"
                 strokeOpacity={0.45} strokeWidth={1.5} />
               <Line type="monotone" dataKey="Market Price"  stroke="#1a1a2e" strokeWidth={2.5}
                 dot={renderDot('#1a1a2e')} activeDot={{ r:6, fill:'#1a1a2e', stroke:'white', strokeWidth:2 }}
                 isAnimationActive={false} />
-              <Line type="monotone" dataKey="Implied Value" stroke="#005EB8" strokeWidth={2.5}
-                dot={renderDot('#005EB8')} activeDot={{ r:6, fill:'#005EB8', stroke:'white', strokeWidth:2 }}
+              <Line type="monotone" dataKey="Implied Value" stroke="#00AEEF" strokeWidth={2.5}
+                dot={renderDot('#00AEEF')} activeDot={{ r:6, fill:'#00AEEF', stroke:'white', strokeWidth:2 }}
                 isAnimationActive={false} />
             </LineChart>
           </ResponsiveContainer>
-          <p style={{ textAlign:'center', marginTop:12, fontSize:14, fontWeight:600, color:'#005EB8' }}>
+          <p style={{ textAlign:'center', marginTop:12, fontSize:14, fontWeight:600, color:'#00AEEF' }}>
             MAPE across 2016–2025: {mape.toFixed(2)}%
           </p>
         </div>
