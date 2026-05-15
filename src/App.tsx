@@ -136,27 +136,80 @@ function computeMAPE(mw: MethodW, rw: RatioW): number {
 }
 
 function findOptimal() {
-  let best = { mape: Infinity, mw: DEFAULT_METHOD, rw: DEFAULT_RATIO }
-  for (let i = 0; i < 5000; i++) {
-    const m = Array.from({length:4}, () => Math.random())
-    const ms = m.reduce((a,b)=>a+b, 0)
-    const mw: MethodW = {
-      peer:       Math.round(m[0]/ms*100),
-      sector:     Math.round(m[1]/ms*100),
-      historical: Math.round(m[2]/ms*100),
-      justified:  Math.round(m[3]/ms*100),
-    }
-    const r = Array.from({length:3}, () => Math.random())
-    const rs = r.reduce((a,b)=>a+b, 0)
-    const rw: RatioW = {
-      pe:  Math.round(r[0]/rs*100),
-      pb:  Math.round(r[1]/rs*100),
-      ptb: Math.round(r[2]/rs*100),
-    }
-    const mape = computeMAPE(mw, rw)
-    if (mape < best.mape) best = { mape, mw, rw }
+  const MKEYS = ['peer', 'sx7e', 'hist', 'just'] as const
+  // Precompute BT values and default-ratio scaling denominators (constant)
+  const btVals: number[][] = MKEYS.map(m => YEARS.map(y => BT[y][m]))
+  const defImpl: number[][] = MKEYS.map(m => YEARS.map(y => methodImpl(m, DEFAULT_RATIO, y)))
+  const mktVals: number[] = YEARS.map(y => MARKET_PRICE[y])
+
+  function buildScales(rw: RatioW): number[][] {
+    return MKEYS.map((m, mi) =>
+      YEARS.map((y, yi) => {
+        const d = defImpl[mi][yi]
+        const a = methodImpl(m, rw, y)
+        return d > 0 ? a / d : 1
+      })
+    )
   }
-  return best
+
+  function mapeOf(ws: number[], sc: number[][]): number {
+    let err = 0
+    for (let yi = 0; yi < YEARS.length; yi++) {
+      let imp = 0
+      for (let mi = 0; mi < 4; mi++) imp += ws[mi] * btVals[mi][yi] * sc[mi][yi]
+      imp /= 100
+      err += Math.abs(imp - mktVals[yi]) / mktVals[yi]
+    }
+    return err / YEARS.length * 100
+  }
+
+  let bestMape = Infinity
+  let bestMw: MethodW = DEFAULT_METHOD
+  let bestRw: RatioW = DEFAULT_RATIO
+
+  function search(
+    step: number,
+    pr: [number,number], sr: [number,number], hr: [number,number],
+    per: [number,number], pbr: [number,number]
+  ) {
+    for (let pe = per[0]; pe <= per[1]; pe += step) {
+      for (let pb = pbr[0]; pb <= Math.min(pbr[1], 100 - pe); pb += step) {
+        const ptb = 100 - pe - pb
+        if (ptb < 0) continue
+        const sc = buildScales({ pe, pb, ptb })
+        for (let peer = pr[0]; peer <= pr[1]; peer += step) {
+          for (let sec = sr[0]; sec <= Math.min(sr[1], 100 - peer); sec += step) {
+            for (let hist = hr[0]; hist <= Math.min(hr[1], 100 - peer - sec); hist += step) {
+              const just = 100 - peer - sec - hist
+              if (just < 0) continue
+              const mape = mapeOf([peer, sec, hist, just], sc)
+              if (mape < bestMape) {
+                bestMape = mape
+                bestMw = { peer, sector: sec, historical: hist, justified: just }
+                bestRw = { pe, pb, ptb }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Pass 1: coarse grid (step=5) — ~409k evaluations, global scan
+  search(5, [0,100],[0,100],[0,100],[0,100],[0,100])
+
+  // Pass 2: fine grid (step=1) within ±6 of coarse best
+  const R = 6
+  const bm = bestMw, br = bestRw
+  search(1,
+    [Math.max(0, bm.peer-R),      Math.min(100, bm.peer+R)],
+    [Math.max(0, bm.sector-R),    Math.min(100, bm.sector+R)],
+    [Math.max(0, bm.historical-R),Math.min(100, bm.historical+R)],
+    [Math.max(0, br.pe-R),        Math.min(100, br.pe+R)],
+    [Math.max(0, br.pb-R),        Math.min(100, br.pb+R)]
+  )
+
+  return { mape: bestMape, mw: bestMw, rw: bestRw }
 }
 
 // ── Sub-components ────────────────────────────────────────────────────────────
