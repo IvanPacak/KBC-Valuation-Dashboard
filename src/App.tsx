@@ -315,7 +315,7 @@ export default function App() {
       <header style={{ background:'white', borderBottom:'1px solid #e5e7eb', padding:'14px 32px' }}>
         <div style={{ maxWidth:1200, margin:'0 auto', display:'flex', alignItems:'center', gap:12 }}>
           <img
-            src="/kbc_logo.png"
+            src="kbc_logo.png"
             alt="KBC" style={{ height:32 }}
           />
           <span style={{ fontSize:11, fontWeight:700, letterSpacing:'0.18em', color:'#9ca3af', textTransform:'uppercase' }}>
